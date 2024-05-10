@@ -52,6 +52,7 @@
           (first to-be-subtracted-sets))
          (rest to-be-subtracted-sets))))))
 
+#_{:clj-kondo/ignore [:redefined-var]}
 (defn complement
   "Complement of set `s1` compared to set `s`"
   [s s1]
