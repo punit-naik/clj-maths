@@ -1,5 +1,5 @@
 (ns org.clojars.punit-naik.class-10.chapter-12
-  "Areas related to Cirlces"
+  "Surface Areas and Volumes"
   (:require [#?(:clj clojure.pprint :cljs cljs.pprint) :as pprint]
             #?(:cljs [cljs.math :as Math]))
   (:import #?(:clj [java.lang Math])))
