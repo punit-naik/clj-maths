@@ -1,12 +1,11 @@
 (ns org.clojars.punit-naik.class-10.chapter-00
-  (:require [#?(:clj clojure.pprint :cljs cljs.pprint) :as pprint]
-            [clojure.string :as str]
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+  (:require #?(:clj [clojure.pprint :as pprint]
+      :cljs [cljs.pprint :as pprint])
+            [clojure.string :as str]))
 
 (defn absolute
   [n]
-  (Math/abs
+  (abs
    (if (#?(:clj ratio?
            :cljs identity) n)
      (double n) n)))

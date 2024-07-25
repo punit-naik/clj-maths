@@ -3,8 +3,8 @@
   (:require [clojure.set :as set]
             [clojure.string :as str]
             [org.clojars.punit-naik.class-10.chapter-00 :refer [least-common-multiple] :as ch-00]
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+            #?(:clj [clojure.math :as math]
+               :cljs [cljs.math :as math])))
 
 (defn add-till
   "Continuosly adds the number `num` to itself till becomes less than or equal to `limit`"
@@ -26,8 +26,9 @@
           (< (second %) b)]}
   (cond
     (> b a) [0 a]
-    (>= a b) (let [added-till (add-till b a)]
-               [(/ added-till b) (Math/abs (- added-till a))])))
+    (>= a b)
+    (let [added-till (add-till b a)]
+      [(/ added-till b) (abs (- added-till a))])))
 
 (defn folk-puzzle
   "Find the number of eggs i.e. `a`, given the egg basket can't hold more than 150 eggs
@@ -139,7 +140,7 @@
                 sort
                 (str/join ", ")))))
    (->> (map (fn [[prime-factor power]]
-               (Math/pow prime-factor power))
+               (math/pow prime-factor (double power)))
              lcm-raw)
         (reduce *)
         long)))
@@ -179,7 +180,7 @@
             " respectively, involved in the numbers "
             (str/join ", " num-list))))
     (->> (map (fn [[common-prime-factor power]]
-                (Math/pow common-prime-factor power))
+                (math/pow common-prime-factor (double power)))
               smallest-power-common-factors)
          (reduce *)
          long)))

@@ -1,8 +1,8 @@
 (ns org.clojars.punit-naik.class-10.chapter-04
   "Quadratic Equations"
   (:require [org.clojars.punit-naik.class-10.chapter-00 :as ch-00]
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+            #?(:clj [clojure.math :as math]
+               :cljs [cljs.math :as math])))
 
 (def root-combo?
   (memoize
@@ -39,7 +39,7 @@
    Returns the split combination"
   [[a b c :as eq]]
   (let [a-c-factors (cond-> (ch-00/factors (ch-00/absolute (* a c)))
-                      (double? b) (concat [(Math/sqrt (ch-00/absolute (* a c)))]))]
+                      (double? b) (concat [(math/sqrt (ch-00/absolute (* a c)))]))]
     (->> (ch-00/cartesian-product
           a-c-factors
           a-c-factors)
@@ -72,8 +72,8 @@
           (fn [i [first-part second-part :as part]]
             (if (root-combo? combo)
               (if (zero? i)
-                [(Math/sqrt first-part) (map #(/ % (Math/sqrt first-part)) part)]
-                [(Math/sqrt second-part) (map #(/ % (Math/sqrt second-part)) part)])
+                [(math/sqrt first-part) (map #(/ % (math/sqrt first-part)) part)]
+                [(math/sqrt second-part) (map #(/ % (math/sqrt second-part)) part)])
               [first-part (map #(/ % first-part) part)])))
          (apply map (fn [common-a common-b]
                       (if (coll? common-a)
@@ -89,7 +89,7 @@
 (defn discriminant
   "Discriminant of a quadratic equation `ax^2+bx+c=0` is: `b^2-4ac`"
   [[a b c]]
-  (- (Math/pow b 2) (* 4 a c)))
+  (- (math/pow b 2.0) (* 4 a c)))
 
 (defn nature-of-roots
   [quadratic-eq]

@@ -1,8 +1,10 @@
 (ns org.clojars.punit-naik.class-10.chapter-13
   "Statistics"
-  (:require [#?(:clj clojure.pprint :cljs cljs.pprint) :as pprint]
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+  (:require
+   #?(:clj [clojure.pprint :as pprint]
+      :cljs [cljs.pprint :as pprint])
+   #?(:clj [clojure.math :as math]
+      :cljs [cljs.math :as math])))
 
 (defmulti frequencies-provided?
   (fn [_ interval?] interval?))
@@ -81,7 +83,7 @@
         interval-size (cond->> (first data)
                         freq-provided? first
                         true (reduce -)
-                        true (Math/abs))
+                        true (abs))
         xi (map #(if-not freq-provided?
                    (mean % :normal)
                    (mean (first %) :normal)) data)
@@ -102,7 +104,7 @@
                         first) ;; [i [[1 2] 5]]
         modal-class (first (second modal-data))
         l (first modal-class)
-        h (Math/abs (reduce - modal-class))
+        h (abs (reduce - modal-class))
         f1 (second (second modal-data))
         f0 (->> (first modal-data)
                 dec

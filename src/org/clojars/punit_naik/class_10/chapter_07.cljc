@@ -1,14 +1,14 @@
 (ns org.clojars.punit-naik.class-10.chapter-07
   "Co-ordinate geometry"
   (:require [org.clojars.punit-naik.class-10.chapter-00 :as ch-00]
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+            #?(:clj [clojure.math :as math]
+               :cljs [cljs.math :as math])))
 
 (defn distance-formula
   [[x1 y1] [x2 y2]]
-  (Math/sqrt
-   (+ (Math/pow (- x2 x1) 2)
-      (Math/pow (- y2 y1) 2))))
+  (math/sqrt
+   (+ (math/pow (- x2 x1) 2.0)
+      (math/pow (- y2 y1) 2.0))))
 
 (defn section-formula
   [[x1 y1] [x2 y2] [m1 m2]]

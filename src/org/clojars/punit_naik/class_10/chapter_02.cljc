@@ -2,8 +2,8 @@
   "Polynomials"
   (:require [clojure.string :as str]
             #?(:cljs [goog.string :as gstring])
-            #?(:cljs [cljs.math :as Math]))
-  (:import #?(:clj [java.lang Math])))
+            #?(:clj [clojure.math :as math]
+               :cljs [cljs.math :as math])))
 
 (defmulti solve-eq
   (fn
@@ -23,7 +23,7 @@
 (defmethod solve-eq :quadratic
   [[a b c]]
   (let [negative-b (* -1 b)
-        square-root-of-b-suared-minus-4-ac (Math/sqrt (- (Math/pow b 2) (* 4 a c)))
+        square-root-of-b-suared-minus-4-ac (math/sqrt (- (math/pow b 2.0) (* 4 a c)))
         twice-a (* 2 a)]
     [(/ (+ negative-b square-root-of-b-suared-minus-4-ac) twice-a)
      (/ (- negative-b square-root-of-b-suared-minus-4-ac) twice-a)]))
@@ -39,7 +39,7 @@
 
 (defn almost-equal
   [a b]
-  (let [diff (- (Math/abs a) (Math/abs b))]
+  (let [diff (- (abs a) (abs b))]
    (or (zero? diff)
        (<= diff 0.000001))))
 
@@ -73,7 +73,7 @@
          (reduce (fn [acc [idx i]]
                    (if-not (zero? i)
                      (let [power (- count-eq (inc idx))
-                           i-abs (Math/abs i)]
+                           i-abs (abs i)]
                        (conj acc
                              (cond-> []
                                (not (zero? idx)) (conj (if (pos? i) "+" "-"))
