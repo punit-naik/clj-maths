@@ -2,7 +2,8 @@
   "Co-ordinate geometry uitls"
   (:require [org.clojars.punit-naik.class-10.chapter-07 :as ch-07]
             #?(:clj [clojure.math :as math]
-               :cljs [cljs.math :as math])))
+               :cljs [cljs.math :as math])
+            [clojure.string :as str]))
 
 (defn dot-product
   [a b]
@@ -52,13 +53,7 @@
      (->> b
           (map #(/ % magnitude)))]))
 
-;; `grid-size` should always be odd
-(def vertical-grid-size 11)
 (def multiplication-factor 2.5)
-;; multiplying by 2 because two x direction units are equal to one y direction unit, so that they look symmetrical
-(def horizontal-grid-size (dec (* 2 vertical-grid-size multiplication-factor)))
-(def horizontal-center (int (quot horizontal-grid-size 2)))
-(def vertical-center (int (quot vertical-grid-size 2)))
 
 (defn max-co-ordinate
   [data & [vertically?]]
@@ -72,12 +67,17 @@
   [data]
   (let[max-horizontal (max-co-ordinate data)
        max-vertical (max-co-ordinate data true)
-       height (dec (* 4 max-vertical))
+       height (dec (* max-vertical (+ max-vertical (math/ceil (* max-vertical 0.3))) 2))
        width (dec (* 2 height multiplication-factor))
        width (if (<= width (* max-horizontal 2))
                (* 2 width)
                width)]
    [width height]))
+
+(defn calculate-dimension-origin
+  [[width height]]
+  [(int (quot width 2))
+   (int (quot height 2))])
 
 (defn init-grid
   [[width height]]
@@ -87,39 +87,87 @@
        (into [])))
 
 (defn draw-axes
-  [grid]
-  (let [grid-with-x-axis-drawn (->> (range (dec horizontal-grid-size))
+  [[width height] [width-center height-center] grid]
+  (let [grid-with-x-axis-drawn (->> (range (dec width))
                                     (reduce
                                      (fn [g i]
                                        (assoc-in
-                                        g [vertical-center i]
+                                        g [height-center i]
                                         (if (odd? (inc i))
                                           " "
                                           "-")))
                                      grid))]
-    (->> (range vertical-grid-size)
+    (->> (range height)
          (reduce
           (fn [g i]
-            (assoc-in g [i horizontal-center] "|"))
+            (assoc-in g [i width-center] "|"))
           grid-with-x-axis-drawn))))
 
-(defn plot-vector [grid [x y]]
-  (let [;; below is actually y co-ordinate
-        plot-x (+ vertical-center x)
-        ;; below is actually x co-ordinate
-        plot-y (+ horizontal-center (* 2 y))]
-    (assoc-in grid [plot-x plot-y] "x")))
+(defn plot-vector
+  [grid
+   [width-center height-center]
+   {:keys [label]
+    :or {label "."}
+    [x y] :point}]
+  (let [plot-y (+ height-center y)
+        plot-x (+ width-center (* 2 x))
+        co-ordinate-value (get-in grid [plot-y plot-x])
+        co-ordinate-value-exists? (and (not= "-" co-ordinate-value)
+                                       (not= "|" co-ordinate-value)
+                                       (not= " " co-ordinate-value)
+                                       (not= "." co-ordinate-value)
+                                       (not= nil co-ordinate-value))]
+    ;; Below, we plot y component first because of the structure of our grid
+    ;; As it's a coll where each row (height/y-component) is a collection of column (width/x-component) values
+    (cond-> grid
+      (not co-ordinate-value-exists?)
+      (assoc-in [plot-y plot-x] label)
+      #_co-ordinate-value-exists?
+      #_(assoc-in [plot-y plot-x] (str co-ordinate-value "," label)))))
 
-(defn plot-vectors [grid vectors]
-  (reduce plot-vector grid vectors))
+(defn identify-data
+  [data]
+  (->> data
+       (map-indexed
+        (fn [i v]
+          {:point v
+           :label (str (char (+ i 97)))}))))
+
+(defn print-identified-vectors
+  [identified-vectors]
+  (->> identified-vectors
+       (group-by :point)
+       (map
+        (fn [[point labels]]
+          (str
+           (->> labels
+                (map :label)
+                (str/join ","))
+           " -> "
+           point)))
+       (str/join "\n")
+       println))
+
+(defn plot-vectors
+  [grid origin vectors & [print-identified-vectors?]]
+  (let [identified-vectors (identify-data vectors)]
+    (when print-identified-vectors?
+     (print-identified-vectors identified-vectors))
+    (reduce
+     (fn [g v]
+       (plot-vector g origin v))
+     grid
+     identified-vectors)))
 
 (defn print-grid [grid]
   (doseq [row (reverse grid)]
     (println (apply str row))))
 
 (defn test []
-  (let [vectors [[1 0] [0 1] [3 3] [-2 -2]]
-        grid (init-grid (determine-dimension vectors))
-        grid-with-axes (draw-axes grid)
-        final-grid (plot-vectors grid-with-axes vectors)]
-    (print-grid final-grid)))
+  (let [vectors [[1 0] [0 1] [3 3] [-2 -2] [3 3] [4 3] [6 3]]
+        dimension (determine-dimension vectors)
+        origin (calculate-dimension-origin dimension)
+        grid (init-grid dimension)
+        grid-with-axes (draw-axes dimension origin grid)
+        grid-with-vectors-plotted (plot-vectors grid-with-axes origin vectors true)]
+    (print-grid grid-with-vectors-plotted)))
